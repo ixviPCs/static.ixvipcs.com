@@ -2,44 +2,75 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Repo Files</title>
+<title>File Explorer</title>
 <style>
-body { font-family: Arial, sans-serif; padding: 20px; }
-a { display: block; margin: 5px 0; text-decoration: none; color: blue; }
+body { font-family: Arial; padding: 20px; margin:0; }
+a { display: block; margin: 3px 0; text-decoration: none; color: blue; }
 a:hover { text-decoration: underline; }
+.folder { font-weight: bold; cursor: pointer; }
+.top-bar {
+  position: fixed; top: 10px; right: 10px; font-size: 14px;
+}
+button { padding: 6px 10px; border-radius:5px; border:none; background:#eee; cursor:pointer; }
+.container { margin-top: 40px; }
 </style>
 </head>
 <body>
 
-<h2>Files in Repo</h2>
-<div id="file-list">Loading...</div>
+<div class="top-bar">
+  <button onclick="history.back()">Back</button>
+</div>
+
+<h2 id="title">Files</h2>
+<div id="file-list" class="container">Loading...</div>
 
 <script>
 const user = 'ixviPCs';
 const repo = 'static.ixvipcs.com';
-const branch = 'main'; // adjust if your default branch is different
-const ignore = ['CNAME', 'index.html']; // files to skip
-const siteBase = 'https://static.ixvipcs.com/'; // your GitHub Pages base URL
+const branch = 'main';
+const ignore = ['CNAME', 'index.html', 'view'];
+const siteBase = 'https://static.ixvipcs.com/';
 
-fetch(`https://api.github.com/repos/${user}/${repo}/contents/?ref=${branch}`)
-  .then(res => res.json())
-  .then(data => {
-    const container = document.getElementById('file-list');
-    container.innerHTML = ''; // clear "Loading..."
-    data.forEach(file => {
-      if (file.type === 'file' && !ignore.includes(file.name)) {
-        const a = document.createElement('a');
-        a.href = siteBase + encodeURIComponent(file.name); // point to your GitHub Pages URL
-        a.textContent = file.name;
-        a.target = "_blank";
-        container.appendChild(a);
-      }
-    });
-  })
-  .catch(err => {
-    document.getElementById('file-list').textContent = 'Failed to load files.';
-    console.error(err);
+// get path from URL query ?path=folder/subfolder/
+const params = new URLSearchParams(window.location.search);
+const folderPath = params.get('path') ? params.get('path') + '/' : '';
+
+document.getElementById('title').textContent = folderPath || 'Home';
+
+async function loadFiles(path, parent) {
+  const url = `https://api.github.com/repos/${user}/${repo}/contents/${path}?ref=${branch}`;
+  const res = await fetch(url);
+  const data = await res.json();
+
+  const container = parent;
+  container.innerHTML = '';
+
+  // sort alphabetically
+  data.sort((a, b) => a.name.localeCompare(b.name));
+
+  data.forEach(file => {
+    if (ignore.includes(file.name)) return;
+
+    const item = document.createElement('a');
+
+    if (file.type === 'file') {
+      item.textContent = file.name;
+      // opens viewer iframe
+      item.href = "view.html?file=" + encodeURIComponent(path + file.name);
+      item.target = "_blank";
+    } else if (file.type === 'dir') {
+      item.textContent = file.name + '/';
+      item.className = 'folder';
+      // clicking folder goes to folder/index.html with path query
+      item.href = 'index.html?path=' + encodeURIComponent(path + file.name);
+    }
+
+    container.appendChild(item);
   });
+}
+
+// load current folder
+loadFiles(folderPath, document.getElementById('file-list'));
 </script>
 
 </body>
