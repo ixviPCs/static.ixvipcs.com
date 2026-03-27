@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Repo Files</title>
+<style>
+body { font-family: Arial, sans-serif; padding: 20px; }
+a { display: block; margin: 5px 0; text-decoration: none; color: blue; }
+a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<h2>Files in Repo</h2>
+<div id="file-list">Loading...</div>
+
+<script>
+const user = 'ixviPCs';
+const repo = 'static.ixvipcs.com';
+const branch = 'main'; // change if your default branch is different
+
+fetch(`https://api.github.com/repos/${user}/${repo}/contents/?ref=${branch}`)
+  .then(res => res.json())
+  .then(data => {
+    const container = document.getElementById('file-list');
+    container.innerHTML = ''; // clear "Loading..."
+    data.forEach(file => {
+      if (file.type === 'file') {
+        const a = document.createElement('a');
+        a.href = file.download_url; // direct link to the raw file
+        a.textContent = file.name;
+        a.target = "_blank";
+        container.appendChild(a);
+      }
+    });
+  })
+  .catch(err => {
+    document.getElementById('file-list').textContent = 'Failed to load files.';
+    console.error(err);
+  });
+</script>
+
+</body>
+</html>
