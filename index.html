@@ -17,7 +17,8 @@ a:hover { text-decoration: underline; }
 <script>
 const user = 'ixviPCs';
 const repo = 'static.ixvipcs.com';
-const branch = 'main'; // change if your default branch is different
+const branch = 'main'; // adjust if your default branch is different
+const ignore = ['CNAME', 'index.html']; // files to skip
 
 fetch(`https://api.github.com/repos/${user}/${repo}/contents/?ref=${branch}`)
   .then(res => res.json())
@@ -25,7 +26,7 @@ fetch(`https://api.github.com/repos/${user}/${repo}/contents/?ref=${branch}`)
     const container = document.getElementById('file-list');
     container.innerHTML = ''; // clear "Loading..."
     data.forEach(file => {
-      if (file.type === 'file') {
+      if (file.type === 'file' && !ignore.includes(file.name)) {
         const a = document.createElement('a');
         a.href = file.download_url; // direct link to the raw file
         a.textContent = file.name;
