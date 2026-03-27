@@ -56,7 +56,7 @@ async function loadFiles(path, parent) {
     if (file.type === 'file') {
       item.textContent = file.name;
       // opens viewer iframe
-      item.href = "view.html?file=" + encodeURIComponent(path + file.name);
+      item.href = "view?file=" + encodeURIComponent(path + file.name);
       item.target = "_blank";
     } else if (file.type === 'dir') {
       item.textContent = file.name + '/';
