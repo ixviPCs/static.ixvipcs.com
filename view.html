@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Viewer</title>
+<style>
+body { margin: 0; font-family: Arial; text-align: center; }
+.top-bar {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+}
+button {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  background: #eee;
+  cursor: pointer;
+}
+iframe {
+  width: 66vw;
+  height: 66vh;
+  margin-top: 60px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+}
+.download {
+  margin-top: 15px;
+}
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <button onclick="history.back()">&lt; Back</button>
+</div>
+
+<iframe id="viewer"></iframe>
+
+<div class="download">
+  <a id="downloadLink" download>
+    <button>Download</button>
+  </a>
+</div>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const file = params.get('file');
+
+const base = 'https://static.ixvipcs.com/';
+
+if (file) {
+  const url = base + file;
+  document.getElementById('viewer').src = url;
+  document.getElementById('downloadLink').href = url;
+}
+</script>
+
+</body>
+</html>
